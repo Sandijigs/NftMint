@@ -17,7 +17,7 @@ export function MintButton() {
   });
 
   // Read user stats
-  const { data: userStats, refetch: refetchStats } = useReadContract({
+  const { data: userStats, refetch: refetchStats, isLoading: isLoadingStats, error: statsError } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     functionName: 'getUserStats',
@@ -78,11 +78,17 @@ export function MintButton() {
   const loading = isPending || isConfirming || isMinting;
 
   // Debug logging
-  console.log('User Stats:', {
+  console.log('🔍 MintButton Debug:', {
+    address: address?.toString(),
+    isConnected,
+    userStats,
+    isLoadingStats,
+    statsError: statsError?.message,
     canMint,
     currentStreak,
     totalMints,
-    rawStats: userStats,
+    contractAddress: CONTRACT_ADDRESS,
+    chainId: process.env.NEXT_PUBLIC_CHAIN_ID,
   });
 
   if (!isConnected) {
@@ -105,7 +111,7 @@ export function MintButton() {
         <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
           <p className="text-sm font-medium">⏳ Transaction submitted! Waiting for confirmation...</p>
           <a
-            href={`https://sepolia.basescan.org/tx/${hash}`}
+            href={`https://basescan.org/tx/${hash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs mt-1 underline hover:text-blue-900"
@@ -121,7 +127,7 @@ export function MintButton() {
           <p className="text-xs mt-1">Your streak: {Number(currentStreak) + 1} days 🔥</p>
           {hash && (
             <a
-              href={`https://sepolia.basescan.org/tx/${hash}`}
+              href={`https://basescan.org/tx/${hash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs mt-1 underline hover:text-green-900 block"
@@ -134,19 +140,39 @@ export function MintButton() {
 
       <button
         onClick={handleMint}
-        disabled={!canMint || loading}
+        disabled={!canMint || loading || isLoadingStats}
         className={`
           w-full py-4 px-6 rounded-xl font-bold text-lg
           transition-all duration-200 transform hover:scale-105
           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
           ${
-            canMint && !loading
+            canMint && !loading && !isLoadingStats
               ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl'
               : 'bg-gray-300 text-gray-600'
           }
         `}
       >
-        {loading ? (
+        {isLoadingStats ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+                fill="none"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+            Loading your stats...
+          </span>
+        ) : loading ? (
           <span className="flex items-center justify-center gap-2">
             <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
               <circle
