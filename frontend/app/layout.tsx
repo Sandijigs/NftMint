@@ -33,8 +33,22 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const frameMetadata = `
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="https://mint-of-the-day.vercel.app/api/frame/image" />
+    <meta property="fc:frame:button:1" content="✨ Mint Today's NFT" />
+    <meta property="fc:frame:button:1:action" content="link" />
+    <meta property="fc:frame:button:1:target" content="https://mint-of-the-day.vercel.app" />
+    <meta property="fc:frame:button:2" content="🏆 Leaderboard" />
+    <meta property="fc:frame:button:2:action" content="post" />
+    <meta property="fc:frame:button:3" content="🔥 My Streak" />
+    <meta property="fc:frame:button:3:action" content="post" />
+    <meta property="fc:frame:post_url" content="https://mint-of-the-day.vercel.app/api/frame" />
+  `;
+
   return (
     <html lang="en">
+      <head dangerouslySetInnerHTML={{ __html: frameMetadata }} />
       <body>
         <Providers>{children}</Providers>
       </body>
