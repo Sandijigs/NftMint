@@ -1,125 +1,100 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFrameMessage, getFrameHtmlResponse } from 'frames.js';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://mint-of-the-day.vercel.app';
 
 /**
  * Farcaster Frame API endpoint
- * This creates an interactive Frame for Farcaster
+ * Creates an interactive Frame for Farcaster
  */
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   // Initial frame - main view
-  const frameHtml = getFrameHtmlResponse({
-    buttons: [
-      {
-        label: '✨ Mint Today\'s NFT',
-        action: 'link',
-        target: APP_URL,
-      },
-      {
-        label: '🏆 Leaderboard',
-        action: 'post',
-      },
-      {
-        label: '🔥 My Streak',
-        action: 'post',
-      },
-    ],
-    image: {
-      src: `${APP_URL}/api/frame/image`,
-      aspectRatio: '1.91:1',
-    },
-    postUrl: `${APP_URL}/api/frame`,
-    ogTitle: 'Mint of the Day',
-    ogDescription: 'Daily NFT minting on Base. Build your streak! 🔥',
-    ogImage: `${APP_URL}/api/frame/image`,
-  });
+  const html = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${APP_URL}/api/frame/image" />
+    <meta property="fc:frame:image:aspect_ratio" content="1.91:1" />
+    <meta property="fc:frame:button:1" content="✨ Mint Today's NFT" />
+    <meta property="fc:frame:button:1:action" content="link" />
+    <meta property="fc:frame:button:1:target" content="${APP_URL}" />
+    <meta property="fc:frame:button:2" content="🏆 Leaderboard" />
+    <meta property="fc:frame:button:2:action" content="post" />
+    <meta property="fc:frame:button:3" content="🔥 My Streak" />
+    <meta property="fc:frame:button:3:action" content="post" />
+    <meta property="fc:frame:post_url" content="${APP_URL}/api/frame" />
+    <meta property="og:title" content="Mint of the Day" />
+    <meta property="og:description" content="Daily NFT minting on Base. Build your streak! 🔥" />
+    <meta property="og:image" content="${APP_URL}/api/frame/image" />
+  </head>
+  <body>
+    <h1>Mint of the Day</h1>
+    <p>Daily NFT minting on Base</p>
+  </body>
+</html>`;
 
-  return new NextResponse(frameHtml, {
-    headers: {
-      'Content-Type': 'text/html',
-    },
+  return new NextResponse(html, {
+    headers: { 'Content-Type': 'text/html' },
   });
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-
-    let message;
-    try {
-      message = await getFrameMessage(body);
-    } catch (e) {
-      return NextResponse.json({ error: 'Invalid frame message' }, { status: 400 });
-    }
-
-    const buttonIndex = message?.buttonIndex || 1;
+    const body = await req.json();
+    const buttonIndex = body?.untrustedData?.buttonIndex || 1;
 
     // Button 2: Leaderboard
     if (buttonIndex === 2) {
-      const frameHtml = getFrameHtmlResponse({
-        buttons: [
-          {
-            label: '⬅️ Back',
-            action: 'post',
-          },
-          {
-            label: '✨ Mint Now',
-            action: 'link',
-            target: APP_URL,
-          },
-        ],
-        image: {
-          src: `${APP_URL}/api/frame/leaderboard`,
-          aspectRatio: '1.91:1',
-        },
-        postUrl: `${APP_URL}/api/frame`,
-      });
-
-      return new NextResponse(frameHtml, {
-        headers: {
-          'Content-Type': 'text/html',
-        },
+      const html = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${APP_URL}/api/frame/leaderboard" />
+    <meta property="fc:frame:image:aspect_ratio" content="1.91:1" />
+    <meta property="fc:frame:button:1" content="⬅️ Back" />
+    <meta property="fc:frame:button:1:action" content="post" />
+    <meta property="fc:frame:button:2" content="✨ Mint Now" />
+    <meta property="fc:frame:button:2:action" content="link" />
+    <meta property="fc:frame:button:2:target" content="${APP_URL}" />
+    <meta property="fc:frame:post_url" content="${APP_URL}/api/frame" />
+  </head>
+  <body>Leaderboard</body>
+</html>`;
+      return new NextResponse(html, {
+        headers: { 'Content-Type': 'text/html' },
       });
     }
 
     // Button 3: User stats
     if (buttonIndex === 3) {
-      const fid = message?.requesterFid || 0;
-      const frameHtml = getFrameHtmlResponse({
-        buttons: [
-          {
-            label: '⬅️ Back',
-            action: 'post',
-          },
-          {
-            label: '✨ Mint Now',
-            action: 'link',
-            target: APP_URL,
-          },
-          {
-            label: '🔗 Share',
-            action: 'link',
-            target: `https://warpcast.com/~/compose?text=I%27m%20building%20my%20NFT%20streak%20on%20Mint%20of%20the%20Day!%20%F0%9F%94%A5&embeds[]=${encodeURIComponent(APP_URL)}`,
-          },
-        ],
-        image: {
-          src: `${APP_URL}/api/frame/stats?fid=${fid}`,
-          aspectRatio: '1.91:1',
-        },
-        postUrl: `${APP_URL}/api/frame`,
-      });
+      const fid = body?.untrustedData?.fid || 0;
+      const shareUrl = `https://warpcast.com/~/compose?text=I'm building my NFT streak on Mint of the Day! 🔥&embeds[]=${encodeURIComponent(APP_URL)}`;
 
-      return new NextResponse(frameHtml, {
-        headers: {
-          'Content-Type': 'text/html',
-        },
+      const html = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${APP_URL}/api/frame/stats?fid=${fid}" />
+    <meta property="fc:frame:image:aspect_ratio" content="1.91:1" />
+    <meta property="fc:frame:button:1" content="⬅️ Back" />
+    <meta property="fc:frame:button:1:action" content="post" />
+    <meta property="fc:frame:button:2" content="✨ Mint Now" />
+    <meta property="fc:frame:button:2:action" content="link" />
+    <meta property="fc:frame:button:2:target" content="${APP_URL}" />
+    <meta property="fc:frame:button:3" content="🔗 Share" />
+    <meta property="fc:frame:button:3:action" content="link" />
+    <meta property="fc:frame:button:3:target" content="${shareUrl}" />
+    <meta property="fc:frame:post_url" content="${APP_URL}/api/frame" />
+  </head>
+  <body>Your Stats</body>
+</html>`;
+      return new NextResponse(html, {
+        headers: { 'Content-Type': 'text/html' },
       });
     }
 
     // Default - back to main
-    return GET(request);
+    return GET();
   } catch (error) {
     console.error('Frame POST error:', error);
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
