@@ -20,6 +20,23 @@
 - 🚀 **Farcaster Frames**: One-click social sharing
 - 🏆 **Leaderboard**: Public ranking of top streak holders
 
+## 📜 Deployed Contract Information
+
+### Base Mainnet Deployment
+
+- **Contract Address:** `0xfee2B3154eA75bA762601e816EDbaBb75920Fa47`
+- **Deployer Address:** `0xeEA4353FE0641fA7730e1c9Bc7cC0f969ECd5914`
+- **Network:** Base Mainnet (Chain ID: 8453)
+- **Contract Name:** Mint of the Day (MOTD)
+- **Live App:** [https://nft-mint-nu-ten.vercel.app/](https://nft-mint-nu-ten.vercel.app/)
+- **Basescan:** [View Contract](https://basescan.org/address/0xfee2B3154eA75bA762601e816EDbaBb75920Fa47)
+
+**Contract Configuration:**
+
+- Mint Price: 0.0 ETH (FREE - gas only)
+- Restore Price: 0.001 ETH
+- Base URI: https://mint-of-the-day.app/metadata
+
 ## 📁 Project Structure
 
 ```
@@ -89,12 +106,14 @@ nano .env
 ```
 
 Add to `.env`:
+
 ```bash
 PRIVATE_KEY=your_private_key_here
 BASESCAN_API_KEY=your_basescan_api_key
 ```
 
 Deploy to Base Sepolia:
+
 ```bash
 npm run compile
 npm test                    # Run tests first
@@ -127,6 +146,7 @@ nano .env.local
 ```
 
 Add to `.env.local`:
+
 ```bash
 NEXT_PUBLIC_CONTRACT_ADDRESS=0x... # Your deployed contract
 NEXT_PUBLIC_CHAIN_ID=84532         # Base Sepolia
@@ -188,12 +208,12 @@ struct MinterData {
 
 ### Key Functions
 
-| Function | Description | Cost |
-|----------|-------------|------|
-| `mintDaily()` | Mint today's NFT | ~80k gas |
-| `restoreStreak()` | Restore broken streak (48h window) | 0.001 ETH |
-| `getUserStats()` | Get user data | Free (view) |
-| `getCurrentDay()` | Get current day number | Free (view) |
+| Function          | Description                        | Cost        |
+| ----------------- | ---------------------------------- | ----------- |
+| `mintDaily()`     | Mint today's NFT                   | ~80k gas    |
+| `restoreStreak()` | Restore broken streak (48h window) | 0.001 ETH   |
+| `getUserStats()`  | Get user data                      | Free (view) |
+| `getCurrentDay()` | Get current day number             | Free (view) |
 
 ### Admin Functions
 
@@ -202,5 +222,3 @@ struct MinterData {
 - `setMintPrice(price)` - Update mint cost
 - `pause()` / `unpause()` - Emergency controls
 - `withdraw()` - Withdraw contract balance
-
-

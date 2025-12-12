@@ -21,3 +21,7 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 .vercel
+
+# Documentation files (except README.md)
+*.md
+!README.md
